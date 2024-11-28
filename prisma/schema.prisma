@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  Int       @id @default(autoincrement())
+  email               String    @unique(map: "email") @db.VarChar(255)
+  name                String    @db.VarChar(100)
+  gender              String    @db.Char(1)
+  birth               DateTime  @db.Date
+  address             String    @db.VarChar(255)
+  phone_certification Int       @default(0)
+  preferredFoodId     Int?      @map("preferred_food_id")
+
+  userPreferredFoods UserPreferredFood[]
+  userStoreReviews  UserStoreReview[]
+  missions          Mission[] 
+
+  @@map("user")
+}
+
+model PreferredFood {
+  id       Int     @id @default(autoincrement())
+  category String? @db.VarChar(100)
+
+  userPreferredFoods UserPreferredFood[]
+
+  @@map("preferred_food")
+}
+
+model UserPreferredFood {
+  id              Int           @id @default(autoincrement())
+  user            User          @relation(fields: [userId], references: [id])
+  userId          Int           @map("user_id")
+  preferredFood   PreferredFood @relation(fields: [preferredFoodId], references: [id])
+  preferredFoodId Int           @map("food_id")
+
+  @@index([preferredFoodId], map: "food_id")
+  @@index([userId], map: "user_id")
+  @@map("user_preferred_food")
+}
+
+model Store{
+  id      Int @id @default(autoincrement())
+  name    String  @db.VarChar(50)
+
+  userStoreReviews  UserStoreReview[]
+  missions Mission[]
+
+  @@map("store")
+}
+
+
+model UserStoreReview{
+  id        Int @id @default(autoincrement())
+  store     Store   @relation(fields:[storeId],references:[id])
+  storeId   Int     @map("store_id")
+  user      User    @relation(fields:[userId],references:[id])
+  userId    Int     @map("user_id")
+  content   String  @db.Text 
+  starCount Int     @default(5) @map("star_count")
+
+  @@map("user_store_review")
+}
+
+model Mission{
+  id              Int     @id @default(autoincrement())
+  store           Store   @relation(fields:[storeId],references:[id])
+  storeId         Int     @map("store_id")
+  user            User    @relation(fields:[userId],references:[id])
+  userId          Int     @map("user_id") @default(1)
+  status          String  @db.VarChar(40)
+  reviewExistence Boolean // true = exist, false = empty
+
+  @@map("mission")
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String   @db.VarChar(512)
+  expiresAt DateTime @map("expires_at")
+
+  @@map("session")
+}

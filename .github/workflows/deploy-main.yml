@@ -1,4 +1,4 @@
-name: deploy-main  # 파이프라인 이름
+name: deploy-main  # 파이프라인 이름임
 
 on:
   push:

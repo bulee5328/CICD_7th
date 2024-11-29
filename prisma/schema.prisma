@@ -74,7 +74,7 @@ model Mission{
   storeId         Int     @map("store_id")
   user            User    @relation(fields:[userId],references:[id])
   userId          Int     @map("user_id") @default(1)
-  status          String  @db.VarChar(40)
+  status          String  @db.VarChar(50)
   reviewExistence Boolean // true = exist, false = empty
 
   @@map("mission")
